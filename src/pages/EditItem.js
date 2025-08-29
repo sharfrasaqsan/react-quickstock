@@ -28,10 +28,12 @@ const EditItem = () => {
     }
   }, [item]);
 
-  if (loading) return <LoadingSpinner />;
-  if (!item) return <LoadingSpinner />;
-
   const handleUpdateItem = async (itemId) => {
+    if (!itemId) {
+      toast.error("Missing item id");
+      return;
+    }
+
     setButtonLoading(true);
 
     if (name.trim() === "") {
@@ -110,6 +112,10 @@ const EditItem = () => {
     setButtonLoading(false);
   };
 
+  if (loading) return <LoadingSpinner />;
+  if (!items) return <p>No items found</p>;
+  if (!item) return <p>Item not found</p>;
+
   return (
     <section>
       <h2>Update Item</h2>
@@ -142,7 +148,7 @@ const EditItem = () => {
               id="stock"
               name="stock"
               value={stock}
-              onChange={(e) => setStock(e.target.value)}
+              onChange={(e) => setStock(Number(e.target.value))}
             />
           </div>
 
