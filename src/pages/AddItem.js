@@ -1,18 +1,21 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import { toast } from "sonner";
-import { db } from "../../firebase/Config";
-import { useData } from "../../contexts/DataContext";
-import ButtonSpinner from "../../utils/ButtonSpinner";
+import { db } from "../firebase/Config";
+import { useData } from "../contexts/DataContext";
+import ButtonSpinner from "../utils/ButtonSpinner";
+import LoadingSpinner from "../utils/LoadingSpinner";
 
 const AddItem = () => {
-  const { setItems } = useData();
+  const { setItems, loading } = useData();
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
   const [unit, setUnit] = useState("");
-  
+
   const [buttonLoading, setButtonLoading] = useState(false);
+
+  if (loading) return <LoadingSpinner />;
 
   const handleAddItem = async () => {
     setButtonLoading(true);

@@ -1,13 +1,14 @@
-import { collection, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { db } from "../../firebase/Config";
-import { useData } from "../../contexts/DataContext";
-import ButtonSpinner from "../../utils/ButtonSpinner";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { db } from "../firebase/Config";
+import { useData } from "../contexts/DataContext";
+import ButtonSpinner from "../utils/ButtonSpinner";
+import LoadingSpinner from "../utils/LoadingSpinner";
 
 const EditItem = () => {
-  const { items, setItems } = useData();
+  const { items, setItems, loading } = useData();
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
@@ -26,6 +27,9 @@ const EditItem = () => {
       setUnit(item.unit);
     }
   }, [item]);
+
+  if (loading) return <LoadingSpinner />;
+  if (!item) return <LoadingSpinner />;
 
   const handleUpdateItem = async (itemId) => {
     setButtonLoading(true);
@@ -85,7 +89,7 @@ const EditItem = () => {
         unit,
         timestamp: serverTimestamp(),
       };
-      await updateDoc(collection(db, "items", itemId), updatedItem);
+      await updateDoc(doc(db, "items", itemId), updatedItem);
       setItems((prev) =>
         prev?.map((i) => (i.id === itemId ? { ...i, ...updatedItem } : i))
       );
@@ -109,64 +113,68 @@ const EditItem = () => {
   return (
     <section>
       <h2>Update Item</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleUpdateItem(item.id);
-        }}
-      >
-        <div>
-          <label htmlFor="name">Item Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoFocus
-            autoComplete="off"
-          />
-        </div>
+      {items.length === 0 ? (
+        <p>No items found.</p>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdateItem(item.id);
+          }}
+        >
+          <div>
+            <label htmlFor="name">Item Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+              autoComplete="off"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="stock">Stock</label>
-          <input
-            type="number"
-            id="stock"
-            name="stock"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-          />
-        </div>
+          <div>
+            <label htmlFor="stock">Stock</label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+            />
+          </div>
 
-        <div>
-          <label htmlFor="unit">Unit</label>
-          <select
-            name="unit"
-            id="unit"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-          >
-            <option value="" disabled selected>
-              Select a unit
-            </option>
-            <option value="kg">kg</option>
-            <option value="L">L</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="unit">Unit</label>
+            <select
+              name="unit"
+              id="unit"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+            >
+              <option value="" disabled selected>
+                Select a unit
+              </option>
+              <option value="kg">kg</option>
+              <option value="L">L</option>
+            </select>
+          </div>
 
-        <div>
-          <button type="submit" disabled={buttonLoading}>
-            {buttonLoading ? (
-              <>
-                Adding... <ButtonSpinner />
-              </>
-            ) : (
-              "Add Item"
-            )}
-          </button>
-        </div>
-      </form>
+          <div>
+            <button type="submit" disabled={buttonLoading}>
+              {buttonLoading ? (
+                <>
+                  Updating... <ButtonSpinner />
+                </>
+              ) : (
+                "Update Item"
+              )}
+            </button>
+          </div>
+        </form>
+      )}
     </section>
   );
 };
