@@ -28,7 +28,7 @@ const RemoveStocks = ({ item }) => {
   };
 
   return (
-    <button className="btn btn--outline" onClick={removeStocks}>
+    <button className="btn btn--primary" onClick={removeStocks}>
       −1
     </button>
   );

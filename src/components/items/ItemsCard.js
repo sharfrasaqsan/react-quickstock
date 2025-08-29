@@ -71,7 +71,7 @@ const ItemsCard = ({ item, index }) => {
       </div>
 
       <div className="item-card__actions">
-        <Link to={`/edit-item/${item.id}`} className="btn btn--outline">
+        <Link to={`/edit-item/${item.id}`} className="btn btn--info">
           Edit
         </Link>
         <button
