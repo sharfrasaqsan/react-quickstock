@@ -5,12 +5,17 @@ import { toast } from "sonner";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/Config";
 import { useData } from "../../contexts/DataContext";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ButtonSpinner from "../../utils/ButtonSpinner";
 
 const ItemsCard = ({ item, index }) => {
   const { setItems } = useData();
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const isLow = useMemo(() => {
+    if (typeof item.lowStockThreshold !== "number") return false;
+    return item.stock <= item.lowStockThreshold;
+  }, [item.stock, item.lowStockThreshold]);
 
   const deleteItem = async (itemId) => {
     setDeleteLoading(true);
@@ -32,32 +37,58 @@ const ItemsCard = ({ item, index }) => {
   };
 
   return (
-    <tr>
-      <td>{index + 1}</td>
-      <td>{item.name}</td>
-      <td>
-        {item.stock}
-        {item.unit}
-      </td>
-      <td>
-        <AddStocks item={item} />
-      </td>
-      <td>
-        <RemoveStocks item={item} />
-      </td>
-      <td>
-        <Link to={`/edit-item/${item.id}`}>Edit</Link>
-        <button onClick={() => deleteItem(item.id)}>
+    <article className={`item-card card ${isLow ? "item-card--low" : ""}`}>
+      <div className="item-card__main">
+        <div className="item-card__title">
+          <span className="item-card__index" aria-hidden>
+            {index + 1}.
+          </span>
+          <div className="item-card__name">
+            <strong>{item.name}</strong>
+            {isLow && <span className="badge badge--low">Low</span>}
+          </div>
+        </div>
+
+        <div className="item-card__stock">
+          <span
+            className="item-card__count"
+            title={
+              item.unit ? `${item.stock} ${item.unit}` : String(item.stock)
+            }
+          >
+            {item.stock}
+            {item.unit ? ` ${item.unit}` : ""}
+          </span>
+
+          <div
+            className="item-card__stepper stepper"
+            aria-label={`Adjust ${item.name} stock`}
+          >
+            <RemoveStocks item={item} />
+            <AddStocks item={item} />
+          </div>
+        </div>
+      </div>
+
+      <div className="item-card__actions">
+        <Link to={`/edit-item/${item.id}`} className="btn btn--outline">
+          Edit
+        </Link>
+        <button
+          className="btn btn--danger"
+          onClick={() => deleteItem(item.id)}
+          disabled={deleteLoading}
+        >
           {deleteLoading ? (
             <>
-              Deleting... <ButtonSpinner />
+              Deleting… <ButtonSpinner />
             </>
           ) : (
             "Delete"
           )}
         </button>
-      </td>
-    </tr>
+      </div>
+    </article>
   );
 };
 

@@ -29,9 +29,9 @@ const AddStocks = ({ item }) => {
   };
 
   return (
-    <>
-      <button onClick={() => addStocks()}>Add</button>
-    </>
+    <button className="btn btn--primary" onClick={addStocks}>
+      +1
+    </button>
   );
 };
 

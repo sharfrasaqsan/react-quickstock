@@ -1,12 +1,7 @@
-import { Spinner } from "react-bootstrap";
-
 const LoadingSpinner = () => {
   return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ height: "50vh" }}
-    >
-      <Spinner animation="border" role="status" variant="primary" />
+    <div className="center" style={{ height: "50vh" }}>
+      <div className="spinner spinner-lg" role="status" aria-label="Loading" />
     </div>
   );
 };
