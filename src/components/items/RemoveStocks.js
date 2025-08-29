@@ -8,7 +8,7 @@ const RemoveStocks = ({ item }) => {
   const { setItems } = useData();
   const removeStocks = async () => {
     try {
-      const updatedStocks = item.stock - 1;
+      const updatedStocks = Math.max(0, item.stock - 1);
       await updateDoc(doc(db, "items", item.id), { stock: updatedStocks });
       setItems((prev) =>
         prev?.map((i) =>
@@ -28,9 +28,9 @@ const RemoveStocks = ({ item }) => {
   };
 
   return (
-    <>
-      <button onClick={() => removeStocks()}>Remove</button>
-    </>
+    <button className="btn btn--primary" onClick={removeStocks}>
+      −1
+    </button>
   );
 };
 

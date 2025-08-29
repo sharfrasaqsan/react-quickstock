@@ -5,6 +5,8 @@ import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
+import PageHeader from "../components/PageHeader";
+import { Link } from "react-router-dom";
 
 const AddItem = () => {
   const { setItems, loading } = useData();
@@ -95,20 +97,34 @@ const AddItem = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <section>
-      <h2>Add Item</h2>
+    <section className="container stack">
+      <PageHeader
+        title="Add Item"
+        subtitle="Create a new inventory item for QuickStock."
+        actions={
+          <>
+            <Link to="/" className="btn btn--outline">
+              Back to Dashboard
+            </Link>
+          </>
+        }
+      />
+
       <form
+        className="card card--padded stack"
         onSubmit={(e) => {
           e.preventDefault();
           handleAddItem();
         }}
       >
-        <div>
-          <label htmlFor="name">Item Name</label>
+        <div className="field">
+          <label className="label" htmlFor="name">
+            Item Name
+          </label>
           <input
+            className="input"
             type="text"
             id="name"
-            name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
@@ -116,38 +132,47 @@ const AddItem = () => {
           />
         </div>
 
-        <div>
-          <label htmlFor="stock">Stock</label>
+        <div className="field">
+          <label className="label" htmlFor="stock">
+            Stock
+          </label>
           <input
+            className="input"
             type="number"
             id="stock"
-            name="stock"
             value={stock}
             onChange={(e) => setStock(Number(e.target.value))}
           />
         </div>
 
-        <div>
-          <label htmlFor="unit">Unit</label>
+        <div className="field">
+          <label className="label" htmlFor="unit">
+            Unit
+          </label>
           <select
-            name="unit"
+            className="select"
             id="unit"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
           >
-            <option value="" disabled selected>
+            <option value="" disabled>
               Select a unit
             </option>
             <option value="kg">kg</option>
             <option value="L">L</option>
+            <option value="pcs">pcs</option>
           </select>
         </div>
 
         <div>
-          <button type="submit" disabled={buttonLoading}>
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={buttonLoading}
+          >
             {buttonLoading ? (
               <>
-                Adding... <ButtonSpinner />
+                Adding… <ButtonSpinner />
               </>
             ) : (
               "Add Item"

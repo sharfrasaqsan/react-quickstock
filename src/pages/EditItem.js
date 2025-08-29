@@ -1,11 +1,12 @@
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
+import PageHeader from "../components/PageHeader";
 
 const EditItem = () => {
   const { items, setItems, loading } = useData();
@@ -117,70 +118,83 @@ const EditItem = () => {
   if (!item) return <p>Item not found</p>;
 
   return (
-    <section>
-      <h2>Update Item</h2>
-      {items.length === 0 ? (
-        <p>No items found.</p>
-      ) : (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleUpdateItem(item.id);
-          }}
-        >
-          <div>
-            <label htmlFor="name">Item Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-              autoComplete="off"
-            />
-          </div>
+    <section className="container stack">
+      <PageHeader
+        title={`Update: ${item.name}`}
+        subtitle="Update the item details below."
+        actions={
+          <Link to="/" className="btn btn--outline">
+            Back to Dashboard
+          </Link>
+        }
+      />
+      <form
+        className="card card--padded stack"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleUpdateItem(item.id);
+        }}
+      >
+        <div className="field">
+          <label className="label" htmlFor="name">
+            Item Name
+          </label>
+          <input
+            className="input"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
 
-          <div>
-            <label htmlFor="stock">Stock</label>
-            <input
-              type="number"
-              id="stock"
-              name="stock"
-              value={stock}
-              onChange={(e) => setStock(Number(e.target.value))}
-            />
-          </div>
+        <div className="field">
+          <label className="label" htmlFor="stock">
+            Stock
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="stock"
+            value={stock}
+            onChange={(e) => setStock(Number(e.target.value))}
+          />
+        </div>
 
-          <div>
-            <label htmlFor="unit">Unit</label>
-            <select
-              name="unit"
-              id="unit"
-              value={unit}
-              onChange={(e) => setUnit(e.target.value)}
-            >
-              <option value="" disabled selected>
-                Select a unit
-              </option>
-              <option value="kg">kg</option>
-              <option value="L">L</option>
-            </select>
-          </div>
+        <div className="field">
+          <label className="label" htmlFor="unit">
+            Unit
+          </label>
+          <select
+            className="select"
+            id="unit"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+          >
+            <option value="" disabled>
+              Select a unit
+            </option>
+            <option value="kg">kg</option>
+            <option value="L">L</option>
+            <option value="pcs">pcs</option>
+          </select>
+        </div>
 
-          <div>
-            <button type="submit" disabled={buttonLoading}>
-              {buttonLoading ? (
-                <>
-                  Updating... <ButtonSpinner />
-                </>
-              ) : (
-                "Update Item"
-              )}
-            </button>
-          </div>
-        </form>
-      )}
+        <div>
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={buttonLoading}
+          >
+            {buttonLoading ? (
+              <>
+                Updating… <ButtonSpinner />
+              </>
+            ) : (
+              "Update Item"
+            )}
+          </button>
+        </div>
+      </form>
     </section>
   );
 };
