@@ -15,8 +15,6 @@ const AddItem = () => {
 
   const [buttonLoading, setButtonLoading] = useState(false);
 
-  if (loading) return <LoadingSpinner />;
-
   const handleAddItem = async () => {
     setButtonLoading(true);
 
@@ -94,6 +92,8 @@ const AddItem = () => {
     setButtonLoading(false);
   };
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <section>
       <h2>Add Item</h2>
@@ -123,7 +123,7 @@ const AddItem = () => {
             id="stock"
             name="stock"
             value={stock}
-            onChange={(e) => setStock(e.target.value)}
+            onChange={(e) => setStock(Number(e.target.value))}
           />
         </div>
 
