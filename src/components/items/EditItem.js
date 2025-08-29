@@ -1,12 +1,13 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useState } from "react";
+import { collection, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { db } from "../../firebase/Config";
 import { useData } from "../../contexts/DataContext";
 import ButtonSpinner from "../../utils/ButtonSpinner";
+import { useParams } from "react-router-dom";
 
 const EditItem = () => {
-  const { setItems } = useData();
+  const { items, setItems } = useData();
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
@@ -14,7 +15,19 @@ const EditItem = () => {
 
   const [buttonLoading, setButtonLoading] = useState(false);
 
-  const handleUpdateItem = async () => {
+  const { id } = useParams();
+
+  const item = items?.find((item) => item.id === id);
+
+  useEffect(() => {
+    if (item) {
+      setName(item.name);
+      setStock(item.stock);
+      setUnit(item.unit);
+    }
+  }, [item]);
+
+  const handleUpdateItem = async (itemId) => {
     setButtonLoading(true);
 
     if (name.trim() === "") {
@@ -66,38 +79,40 @@ const EditItem = () => {
     }
 
     try {
-      const newItem = {
+      const updatedItem = {
         name,
         stock,
         unit,
-        createdAt: serverTimestamp(),
+        timestamp: serverTimestamp(),
       };
-      await addDoc(collection(db, "items"), newItem);
-      setItems((prev) => [...prev, newItem]);
-      toast.success("Item added successfully");
+      await updateDoc(collection(db, "items", itemId), updatedItem);
+      setItems((prev) =>
+        prev?.map((i) => (i.id === itemId ? { ...i, ...updatedItem } : i))
+      );
+      toast.success("Item updated successfully");
       setName("");
       setStock(0);
       setUnit("");
     } catch (err) {
       console.log(
-        "Error adding item",
+        "Error updating item",
         "error: ",
         err,
         "error message: ",
         err.message
       );
-      toast.error("Error adding item");
+      toast.error("Error updating item");
     }
     setButtonLoading(false);
   };
 
   return (
     <section>
-      <h2>Add Item</h2>
+      <h2>Update Item</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleUpdateItem();
+          handleUpdateItem(item.id);
         }}
       >
         <div>

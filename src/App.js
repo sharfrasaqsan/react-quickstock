@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import AddItem from "./components/items/AddItem";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
+import EditItem from "./components/items/EditItem";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
 
           <Route path="/add-item" element={<AddItem />} />
+          <Route path="/edit-item/:id" element={<EditItem />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

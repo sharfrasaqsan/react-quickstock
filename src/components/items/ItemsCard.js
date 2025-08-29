@@ -1,6 +1,7 @@
 import React from "react";
 import AddStocks from "./AddStocks";
 import RemoveStocks from "./RemoveStocks";
+import { Link } from "react-router-dom";
 
 const ItemsCard = ({ item, index }) => {
   return (
@@ -18,7 +19,7 @@ const ItemsCard = ({ item, index }) => {
         <RemoveStocks item={item} />
       </td>
       <td>
-        <button>Edit</button>
+        <Link to={`/edit-item/${item.id}`}>Edit</Link>
         <button>Delete</button>
       </td>
     </tr>
