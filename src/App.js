@@ -7,6 +7,9 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { Toaster } from "sonner";
+import AddItem from "./components/items/AddItem";
+import NotFound from "./pages/NotFound";
+import ScrollToTop from "./utils/ScrollToTop";
 
 function App() {
   return (
@@ -18,13 +21,23 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
 
+          <Route path="/add-item" element={<AddItem />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
       <Footer />
-      <Toaster />
+
+      <ScrollToTop />
+      <Toaster
+        position="top-right"
+        theme="system"
+        toastOptions={{ duration: 5000 }}
+      />
     </div>
   );
 }
