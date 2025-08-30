@@ -61,18 +61,6 @@ const EditItem = () => {
       return;
     }
 
-    if (stock % 1 !== 0) {
-      toast.error("Stock must be an integer.");
-      setButtonLoading(false);
-      return;
-    }
-
-    if (stock === 0) {
-      toast.error("Stock cannot be zero.");
-      setButtonLoading(false);
-      return;
-    }
-
     if (unit.length > 10) {
       toast.error("Unit cannot be more than 10 characters.");
       setButtonLoading(false);
@@ -90,7 +78,7 @@ const EditItem = () => {
         name,
         stock,
         unit,
-        timestamp: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       };
       await updateDoc(doc(db, "items", itemId), updatedItem);
       setItems((prev) =>

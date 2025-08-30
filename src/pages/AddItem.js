@@ -44,18 +44,6 @@ const AddItem = () => {
       return;
     }
 
-    if (stock % 1 !== 0) {
-      toast.error("Stock must be an integer.");
-      setButtonLoading(false);
-      return;
-    }
-
-    if (stock === 0) {
-      toast.error("Stock cannot be zero.");
-      setButtonLoading(false);
-      return;
-    }
-
     if (unit.length > 10) {
       toast.error("Unit cannot be more than 10 characters.");
       setButtonLoading(false);
@@ -75,8 +63,8 @@ const AddItem = () => {
         unit,
         createdAt: serverTimestamp(),
       };
-      await addDoc(collection(db, "items"), newItem);
-      setItems((prev) => [...prev, newItem]);
+      const res = await addDoc(collection(db, "items"), newItem);
+      setItems((prev) => [...prev, { id: res.id, ...newItem }]);
       toast.success("Item added successfully");
       setName("");
       setStock(0);

@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/Config";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
 import LoadingSpinner from "../utils/LoadingSpinner";
+import PageHeader from "../components/PageHeader";
 
 const Login = () => {
   const { user, setUser } = useAuth();
@@ -19,9 +20,11 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
 
+  const handleLogin = async () => {
     if (user) {
       toast.error("You are already logged in.");
       setLoginLoading(false);
@@ -48,12 +51,16 @@ const Login = () => {
 
     setLoginLoading(true);
     try {
-      const userCredintials = signInWithEmailAndPassword(auth, email, password);
+      const userCredintials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       setUser(userCredintials.user);
-      navigate("/");
-      toast.success("Logged in successfully");
       setEmail("");
       setPassword("");
+      toast.success("Logged in successfully");
+      navigate("/");
     } catch (err) {
       console.log(
         "Error logging in",
@@ -63,61 +70,84 @@ const Login = () => {
         err.message
       );
       toast.error("Error logging in");
+    } finally {
+      setLoginLoading(false);
     }
-    setLoginLoading(false);
   };
 
   if (loading) {
     return <LoadingSpinner />;
   }
-  if (user) {
-    return <LoadingSpinner />;
-  }
 
   return (
-    <section>
-      <div>
-        <h2>Login</h2>
-      </div>
-      <div>
-        <form onSubmit={handleLogin}>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+    <section className="container stack">
+      <PageHeader
+        title="Login"
+        subtitle="Access your QuickStock dashboard."
+        actions={
+          <Link to="/register" className="btn btn--outline">
+            Create account
+          </Link>
+        }
+      />
 
-          <div>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+      <form
+        className="card card--padded stack"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin();
+        }}
+        aria-busy={loginLoading}
+      >
+        <div className="field">
+          <label className="label" htmlFor="email">
+            Email
+          </label>
+          <input
+            className="input"
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            autoFocus
+          />
+        </div>
 
-          <div>
-            <button type="submit">
-              {loginLoading ? (
-                <>
-                  Logging in... <ButtonSpinner />
-                </>
-              ) : (
-                "Login"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="field">
+          <label className="label" htmlFor="password">
+            Password
+          </label>
+          <input
+            className="input"
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn--primary w-100"
+          disabled={loginLoading}
+        >
+          {loginLoading ? (
+            <>
+              <span>Logging in…</span> <ButtonSpinner />
+            </>
+          ) : (
+            "Login"
+          )}
+        </button>
+
+        <small className="text-muted">
+          Don’t have an account? <Link to="/register">Register</Link>
+        </small>
+      </form>
     </section>
   );
 };
