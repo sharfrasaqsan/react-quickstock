@@ -61,6 +61,13 @@ const Register = () => {
       return;
     }
 
+    const existEmail = await auth.fetchSignInMethodsForEmail(email);
+    if (existEmail.length > 0) {
+      toast.error("Email already exists.");
+      setRegisterLoading(false);
+      return;
+    }
+
     try {
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
