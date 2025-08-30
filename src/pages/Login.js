@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import { signInWithEmailAndPassword } from "firebase/auth";
