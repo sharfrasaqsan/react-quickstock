@@ -1,5 +1,5 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -12,8 +12,10 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
 import EditItem from "./pages/EditItem";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import { useAuth } from "./contexts/AuthContext";
 
 function App() {
+  const { user } = useAuth();
   return (
     <div>
       <Header />
@@ -48,7 +50,10 @@ function App() {
             }
           />
 
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/" replace /> : <Login />}
+          />
           <Route path="/register" element={<Register />} />
 
           <Route path="*" element={<NotFound />} />
