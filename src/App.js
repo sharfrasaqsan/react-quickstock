@@ -11,6 +11,7 @@ import AddItem from "./pages/AddItem";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
 import EditItem from "./pages/EditItem";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   return (
@@ -20,10 +21,32 @@ function App() {
 
       <main>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/add-item" element={<AddItem />} />
-          <Route path="/edit-item/:id" element={<EditItem />} />
+          <Route
+            path="/add-item"
+            element={
+              <ProtectedRoute>
+                <AddItem />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edit-item/:id"
+            element={
+              <ProtectedRoute>
+                <EditItem />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
