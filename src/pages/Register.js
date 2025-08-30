@@ -6,7 +6,8 @@ import ButtonSpinner from "../utils/ButtonSpinner";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useData } from "../contexts/DataContext";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 
 const Register = () => {
   const { setUsers, loading } = useData();
@@ -109,75 +110,101 @@ const Register = () => {
   }
 
   return (
-    <section>
-      <div>
-        <h2>Register</h2>
-      </div>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="name">Name *</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+    <section className="container stack">
+      <PageHeader
+        title="Create your account"
+        subtitle="Join QuickStock to manage your inventory with ease."
+        actions={
+          <Link to="/login" className="btn btn--outline">
+            Back to Login
+          </Link>
+        }
+      />
 
-          <div>
-            <label htmlFor="email">Email *</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+      <form
+        className="card card--padded stack"
+        onSubmit={handleSubmit}
+        aria-busy={registerLoading}
+      >
+        <div className="field">
+          <label className="label" htmlFor="name">
+            Name *
+          </label>
+          <input
+            className="input"
+            type="text"
+            id="name"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="name"
+            autoFocus
+          />
+        </div>
 
-          <div>
-            <label htmlFor="password">Password *</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+        <div className="field">
+          <label className="label" htmlFor="email">
+            Email *
+          </label>
+          <input
+            className="input"
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+          />
+        </div>
 
-          <div>
-            <label htmlFor="confirm-password">Confirm Password *</label>
-            <input
-              type="password"
-              name="confirm-password"
-              id="confirm-password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+        <div className="field">
+          <label className="label" htmlFor="password">
+            Password *
+          </label>
+          <input
+            className="input"
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+          />
+        </div>
 
-          <button type="submit">
-            {registerLoading ? (
-              <>
-                Registering... <ButtonSpinner />
-              </>
-            ) : (
-              "Register"
-            )}
-          </button>
-        </form>
-      </div>
+        <div className="field">
+          <label className="label" htmlFor="confirm-password">
+            Confirm Password *
+          </label>
+          <input
+            className="input"
+            type="password"
+            id="confirm-password"
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn--primary w-100"
+          disabled={registerLoading}
+        >
+          {registerLoading ? (
+            <>
+              <span>Registering…</span> <ButtonSpinner />
+            </>
+          ) : (
+            "Register"
+          )}
+        </button>
+
+        <small className="text-muted">
+          Already have an account? <Link to="/login">Login</Link>
+        </small>
+      </form>
     </section>
   );
 };
