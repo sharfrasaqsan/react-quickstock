@@ -8,6 +8,7 @@ const DataContext = createContext();
 export const DataProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [users, setUsers] = useState([]);
+  const [logs, setLogs] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -61,8 +62,35 @@ export const DataProvider = ({ children }) => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true);
+      try {
+        const res = await getDocs(collection(db, "logs"));
+        const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setLogs(data);
+      } catch (err) {
+        console.log(
+          "Error fetching logs",
+          "error: ",
+          err,
+          "error message: ",
+          err.message
+        );
+        toast.error("Error fetching logs");
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLogs();
+  }, []);
+
   return (
-    <DataContext.Provider value={{ items, setItems, users, setUsers, loading }}>
+    <DataContext.Provider
+      value={{ items, setItems, users, setUsers, logs, setLogs, loading }}
+    >
       {children}
     </DataContext.Provider>
   );

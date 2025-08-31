@@ -14,6 +14,8 @@ import EditItem from "./pages/EditItem";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import ResetPassword from "./pages/ResetPassword";
 import PublicRoute from "./utils/PublicRoute";
+import Logs from "./pages/Logs";
+import AdminProtectedRoute from "./utils/AdminProtectedRoute";
 
 function App() {
   return (
@@ -72,6 +74,15 @@ function App() {
               <PublicRoute>
                 <ResetPassword />
               </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/logs"
+            element={
+              <AdminProtectedRoute>
+                <Logs />
+              </AdminProtectedRoute>
             }
           />
 
