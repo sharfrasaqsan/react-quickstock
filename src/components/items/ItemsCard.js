@@ -1,5 +1,3 @@
-import AddStocks from "./AddStocks";
-import RemoveStocks from "./RemoveStocks";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { deleteDoc, doc } from "firebase/firestore";
@@ -7,6 +5,7 @@ import { db } from "../../firebase/Config";
 import { useData } from "../../contexts/DataContext";
 import { useMemo, useState } from "react";
 import ButtonSpinner from "../../utils/ButtonSpinner";
+import UpdateStock from "./UpdateStock";
 
 const ItemsCard = ({ item, index }) => {
   const { setItems } = useData();
@@ -53,7 +52,9 @@ const ItemsCard = ({ item, index }) => {
           <span
             className="item-card__count"
             title={
-              item.unit ? `${item.stock} ${item.unit}` : String(item.stock)
+              item.unit
+                ? `${item.stock} ${item.unit} ${item.name}`
+                : String(item.stock)
             }
           >
             {item.stock}
@@ -64,8 +65,9 @@ const ItemsCard = ({ item, index }) => {
             className="item-card__stepper stepper"
             aria-label={`Adjust ${item.name} stock`}
           >
-            <RemoveStocks item={item} />
-            <AddStocks item={item} />
+            {/* <RemoveStocks item={item} />
+            <AddStocks item={item} /> */}
+            <UpdateStock item={item} />
           </div>
         </div>
       </div>
