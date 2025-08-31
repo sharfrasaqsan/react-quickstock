@@ -9,17 +9,19 @@ import { useData } from "../contexts/DataContext";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
 import {
+  addDoc,
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
 
 const Login = () => {
   const { user, setUser } = useAuth();
-  const { loading } = useData();
+  const { setLogs, loading } = useData();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,6 +86,17 @@ const Login = () => {
       setEmail("");
       setPassword("");
       toast.success("Logged in successfully");
+
+      // Add login log
+      const newLoginLog = {
+        userId: res.id,
+        action: "login",
+        email: res.data().email,
+        timestamp: serverTimestamp(),
+      };
+      const loginLog = await addDoc(collection(db, "logs"),  newLoginLog );
+      setLogs((prev) => [...prev, { id: loginLog.id, ...newLoginLog }]);
+
       navigate("/");
     } catch (err) {
       console.log(
