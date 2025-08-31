@@ -3,15 +3,23 @@ import { toast } from "sonner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase/Config";
 import ButtonSpinner from "../utils/ButtonSpinner";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import { useData } from "../contexts/DataContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 
 const Register = () => {
-  const { setUsers, loading } = useData();
   const { setUser } = useAuth();
+  const { setUsers, loading } = useData();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -62,7 +70,9 @@ const Register = () => {
       return;
     }
 
-    const existEmail = await auth.fetchSignInMethodsForEmail(email);
+    const existEmail = await getDocs(
+      query(collection(db, "users"), where("email", "==", email))
+    );
     if (existEmail.length > 0) {
       toast.error("Email already exists.");
       setRegisterLoading(false);

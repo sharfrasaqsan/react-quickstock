@@ -2,12 +2,20 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/Config";
+import { auth, db } from "../firebase/Config";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 const Login = () => {
   const { user, setUser } = useAuth();
@@ -37,6 +45,15 @@ const Login = () => {
       return;
     }
 
+    const regEmail = await getDocs(
+      query(collection(db, "users"), where("email", "==", email))
+    );
+    if (regEmail.docs.length === 0) {
+      toast.error("User does not exist.");
+      setLoginLoading(false);
+      return;
+    }
+
     if (!password) {
       toast.error("Password cannot be empty.");
       setLoginLoading(false);
@@ -56,7 +73,14 @@ const Login = () => {
         email,
         password
       );
-      setUser(userCredintials.user);
+      const fbUser = userCredintials.user;
+      const res = await getDoc(doc(db, "users", fbUser.uid));
+      if (!res.exists()) {
+        toast.error("User does not exist in database.");
+        setLoginLoading(false);
+        return;
+      }
+      setUser(res.data());
       setEmail("");
       setPassword("");
       toast.success("Logged in successfully");
@@ -143,6 +167,10 @@ const Login = () => {
             "Login"
           )}
         </button>
+
+        <small className="text-muted">
+          Forgot your password? <Link to="/reset-password">Reset password</Link>
+        </small>
 
         <small className="text-muted">
           Don’t have an account? <Link to="/register">Register</Link>
