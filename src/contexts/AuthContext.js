@@ -12,10 +12,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
         try {
-          const res = await getDoc(doc(db, "users", user.uid));
+          const res = await getDoc(doc(db, "users", fbUser.uid));
           if (res.exists()) {
             setUser({ id: res.id, ...res.data() });
           } else {

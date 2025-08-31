@@ -1,5 +1,5 @@
 import "./App.css";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -12,10 +12,10 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
 import EditItem from "./pages/EditItem";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import { useAuth } from "./contexts/AuthContext";
+import ResetPassword from "./pages/ResetPassword";
+import PublicRoute from "./utils/PublicRoute";
 
 function App() {
-  const { user } = useAuth();
   return (
     <div>
       <Header />
@@ -52,9 +52,28 @@ function App() {
 
           <Route
             path="/login"
-            element={user ? <Navigate to="/" replace /> : <Login />}
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
           />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="reset-password"
+            element={
+              <PublicRoute>
+                <ResetPassword />
+              </PublicRoute>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
