@@ -87,9 +87,44 @@ export const DataProvider = ({ children }) => {
     fetchLogs();
   }, []);
 
+  // Search
+  const [logSearch, setLogSearch] = useState("");
+  const [logFilter, setLogFilter] = useState("all");
+  const [filteredLogs, setFilteredLogs] = useState([]);
+
+  useEffect(() => {
+    const searchedLogs = logs.filter((log) => {
+      const user = users.find((u) => u.id === log.userId);
+
+      const matchesSearch =
+        log?.itemName.toLowerCase().includes(logSearch.toLowerCase()) ||
+        user?.name?.toLowerCase().includes(logSearch.toLowerCase()) ||
+        user?.email?.toLowerCase().includes(logSearch.toLowerCase());
+
+      const matchesFilter = logFilter === "all" || log.itemName === logFilter;
+
+      return matchesSearch && matchesFilter;
+    });
+
+    setFilteredLogs(searchedLogs);
+  }, [logs, users, logSearch, logFilter]);
+
   return (
     <DataContext.Provider
-      value={{ items, setItems, users, setUsers, logs, setLogs, loading }}
+      value={{
+        items,
+        setItems,
+        users,
+        setUsers,
+        logs,
+        setLogs,
+        loading,
+        logSearch,
+        setLogSearch,
+        logFilter,
+        setLogFilter,
+        filteredLogs,
+      }}
     >
       {children}
     </DataContext.Provider>
