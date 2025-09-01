@@ -2,6 +2,7 @@ import React from "react";
 import ItmesList from "../components/items/ItmesList";
 import PageHeader from "../components/PageHeader";
 import { Link } from "react-router-dom";
+import ItemSearch from "../components/items/ItemSearch";
 
 const Dashboard = () => {
   return (
@@ -16,7 +17,12 @@ const Dashboard = () => {
         }
       />
       <div className="card card--padded">
-        <ItmesList />
+        <div>
+          <ItemSearch />
+        </div>
+        <div>
+          <ItmesList />
+        </div>
       </div>
     </section>
   );

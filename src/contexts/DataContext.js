@@ -87,19 +87,41 @@ export const DataProvider = ({ children }) => {
     fetchLogs();
   }, []);
 
-  // Search
+  // Item Search
+  const [itemSearch, setItemSearch] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
+
+  useEffect(() => {
+    if (!itemSearch.trim()) {
+      setFilteredItems(items);
+      return;
+    }
+
+    const searchedItems = items?.filter((item) =>
+      item?.name?.toLowerCase().includes(itemSearch.toLowerCase())
+    );
+
+    setFilteredItems(searchedItems);
+  }, [items, itemSearch]);
+
+  // Log Search
   const [logSearch, setLogSearch] = useState("");
   const [logFilter, setLogFilter] = useState("all");
   const [filteredLogs, setFilteredLogs] = useState([]);
 
   useEffect(() => {
-    const searchedLogs = logs.filter((log) => {
+    if (!logSearch.trim()) {
+      setFilteredLogs(logs);
+      return;
+    }
+
+    const searchedLogs = logs?.filter((log) => {
       const user = users.find((u) => u.id === log.userId);
 
       const matchesSearch =
-        log?.itemName.toLowerCase().includes(logSearch.toLowerCase()) ||
-        user?.name?.toLowerCase().includes(logSearch.toLowerCase()) ||
-        user?.email?.toLowerCase().includes(logSearch.toLowerCase());
+        log?.itemName.toLowerCase()?.includes(logSearch.toLowerCase()) ||
+        user?.name?.toLowerCase()?.includes(logSearch.toLowerCase()) ||
+        user?.email?.toLowerCase()?.includes(logSearch.toLowerCase());
 
       const matchesFilter = logFilter === "all" || log.itemName === logFilter;
 
@@ -119,6 +141,9 @@ export const DataProvider = ({ children }) => {
         logs,
         setLogs,
         loading,
+        itemSearch,
+        setItemSearch,
+        filteredItems,
         logSearch,
         setLogSearch,
         logFilter,

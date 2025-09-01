@@ -19,7 +19,7 @@ const Logs = () => {
         }
       />
 
-      <div className="card card--padded mt-6">
+      <div className="card card--padded mt-3">
         <div className="mb-4 d-flex align-items-center justify-content-between">
           <LogSearch />
           <LogFilter />
