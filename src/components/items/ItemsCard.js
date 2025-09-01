@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { deleteDoc, doc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../../firebase/Config";
 import { useData } from "../../contexts/DataContext";
 import { useMemo, useState } from "react";
 import ButtonSpinner from "../../utils/ButtonSpinner";
 import UpdateStock from "./UpdateStock";
 
-const ItemsCard = ({ item, index }) => {
-  const { setItems } = useData();
+const ItemsCard = ({ item, index, user }) => {
+  const { setItems, setLogs } = useData();
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const isLow = useMemo(() => {
@@ -22,6 +28,19 @@ const ItemsCard = ({ item, index }) => {
       await deleteDoc(doc(db, "items", itemId));
       setItems((prev) => prev.filter((item) => item.id !== itemId));
       toast.success("Item deleted successfully");
+
+      // new Log
+      const newLog = {
+        userId: user.id,
+        action: "DELETE_ITEM",
+        itemName: item.name,
+        stock: item.stock,
+        itemUnit: item.unit,
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+      };
+      const deleteLog = await addDoc(collection(db, "logs"), newLog);
+      setLogs((prev) => [...prev, { id: deleteLog.id, ...newLog }]);
     } catch (err) {
       console.log(
         "Error deleting item",
@@ -34,6 +53,9 @@ const ItemsCard = ({ item, index }) => {
     }
     setDeleteLoading(false);
   };
+
+  if (!item) return <p>Item not found</p>;
+  if (!user) return <p>User not found</p>;
 
   return (
     <article className={`item-card card ${isLow ? "item-card--low" : ""}`}>

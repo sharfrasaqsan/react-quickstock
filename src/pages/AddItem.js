@@ -1,12 +1,12 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { act, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const AddItem = () => {
@@ -18,6 +18,7 @@ const AddItem = () => {
   const [unit, setUnit] = useState("");
 
   const [buttonLoading, setButtonLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddItem = async () => {
     setButtonLoading(true);
@@ -71,6 +72,7 @@ const AddItem = () => {
       setName("");
       setStock(0);
       setUnit("");
+      navigate("/");
 
       // New log
       const newLog = {
