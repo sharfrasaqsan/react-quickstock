@@ -1,15 +1,17 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useState } from "react";
+import { act, useState } from "react";
 import { toast } from "sonner";
 import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const AddItem = () => {
-  const { setItems, loading } = useData();
+  const { user } = useAuth();
+  const { setItems, setLogs, loading } = useData();
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
@@ -69,6 +71,19 @@ const AddItem = () => {
       setName("");
       setStock(0);
       setUnit("");
+
+      // New log
+      const newLog = {
+        userId: user.id,
+        action: "ADD_ITEM",
+        itemName: name,
+        itemStock: stock,
+        itemUnit: unit,
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+      };
+      const addLog = await addDoc(collection(db, "logs"), newLog);
+      setLogs((prev) => [...prev, { id: addLog.id, ...newLog }]);
     } catch (err) {
       console.log(
         "Error adding item",
@@ -83,6 +98,7 @@ const AddItem = () => {
   };
 
   if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <section className="container stack">

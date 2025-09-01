@@ -1,15 +1,23 @@
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
+import { useAuth } from "../contexts/AuthContext";
 
 const EditItem = () => {
-  const { items, setItems, loading } = useData();
+  const { user } = useAuth();
+  const { items, setItems, setLogs, loading } = useData();
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState(0);
@@ -88,6 +96,22 @@ const EditItem = () => {
       setName("");
       setStock(0);
       setUnit("");
+
+      // New Log
+      const newLog = {
+        userId: user.id,
+        action: "UPDATE_ITEM",
+        itemName: item.name,
+        updatedItemName: name,
+        stockFrom: item.stock,
+        stockTo: stock,
+        itemUnit: item.unit,
+        updatedItemUnit: unit,
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+      };
+      const updateLog = await addDoc(collection(db, "logs"), newLog);
+      setLogs((prev) => [...prev, { id: updateLog.id, ...newLog }]);
     } catch (err) {
       console.log(
         "Error updating item",
@@ -102,6 +126,7 @@ const EditItem = () => {
   };
 
   if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/" replace />;
   if (!items) return <p>No items found</p>;
   if (!item) return <p>Item not found</p>;
 
