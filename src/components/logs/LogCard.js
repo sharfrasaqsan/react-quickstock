@@ -4,13 +4,13 @@ const LogCard = ({ log, user, index }) => {
   return (
     <tr>
       <td>{index + 1}</td>
-      <td className="mw-50" style={{ maxWidth: "115px" }}>
+      <td className="mw-50" style={{ minWidth: "250px" }}>
         {user ? user.name : log.userId}
       </td>
-      <td className="text-muted" style={{ maxWidth: "150px" }}>
+      <td className="text-muted" style={{ minWidth: "250px" }}>
         {user ? user.email : log.email}
       </td>
-      <td style={{ maxWidth: "150px" }}>
+      <td style={{ minWidth: "250px" }}>
         {log.action === "ADD_ITEM" && (
           <>
             Newly added item <b>{log.itemName}</b>
@@ -77,7 +77,7 @@ const LogCard = ({ log, user, index }) => {
           </>
         )}
       </td>
-      <td className="text-muted">
+      <td className="text-muted" style={{ minWidth: "250px" }}>
         {log.createdAt?.toDate
           ? log.createdAt.toDate().toLocaleString()
           : new Date(log.createdAtMs).toLocaleString()}

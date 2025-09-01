@@ -7,15 +7,19 @@ import NotFoundText from "../../utils/NotFoundText";
 
 const ItmesList = () => {
   const { user } = useAuth();
-  const { items, loading } = useData();
+  const { items, filteredItems, itemSearch, loading } = useData();
 
   if (loading) return <LoadingSpinner />;
+
+  if (!filteredItems || filteredItems.length === 0)
+    return <NotFoundText text={`No items match the ${itemSearch} criteria.`} />;
+
   if (!items || items.length === 0)
-    return <NotFoundText text={"No items added yet. Please add one first."} />;
+    return <NotFoundText text={"No items yet."} />;
 
   return (
     <div className="cards-list">
-      {items.map((item, index) => (
+      {filteredItems?.map((item, index) => (
         <ItemsCard key={item.id} item={item} index={index} user={user} />
       ))}
     </div>

@@ -3,10 +3,13 @@ import { useData } from "../../contexts/DataContext";
 import NotFoundText from "../../utils/NotFoundText";
 
 const LogList = () => {
-  const { filteredLogs, users } = useData();
+  const { filteredLogs, logSearch, users } = useData();
   const reversedLogs = [...filteredLogs].sort(
     (a, b) => b.createdAt - a.createdAt
   );
+
+  if (filteredLogs.length === 0)
+    return <NotFoundText text={`No logs match the ${logSearch} criteria.`} />;
 
   if (!reversedLogs || reversedLogs.length === 0)
     return <NotFoundText text={"No logs yet."} />;
