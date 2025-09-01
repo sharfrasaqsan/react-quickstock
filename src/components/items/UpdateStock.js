@@ -65,38 +65,44 @@ const UpdateStock = ({ item }) => {
   };
 
   return (
-    <div>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <div>
-          <label htmlFor="updatedStock">Enter updated stock value</label>
-          <input
-            type="number"
-            name="updatedStock"
-            id="updatedStock"
-            placeholder="Enter updated stock value"
-            value={updatedStock}
-            onChange={(e) => setUpdatedStock(e.target.value)}
-          />
-        </div>
+    <form
+      onSubmit={(e) => e.preventDefault()}
+      className="field"
+      style={{ maxWidth: "225px" }}
+    >
+      {/* Input + Button inline */}
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <input
+          type="number"
+          name="updatedStock"
+          id="updatedStock"
+          placeholder="+/- Stock"
+          className="input"
+          value={updatedStock ?? ""}
+          onChange={(e) => setUpdatedStock(e.target.value)}
+          style={{ flex: 1 }}
+        />
 
-        {updatedStock && (
-          <div>
-            {item.stock} + {updatedStock} ={" "}
-            {Number(item.stock) + Number(updatedStock)} {item.unit}
-          </div>
-        )}
-
-        <button type="submit" onClick={() => handleUpdatedStock(item.id)}>
-          {updateLoading ? (
-            <>
-              Updating... <ButtonSpinner />{" "}
-            </>
-          ) : (
-            "Update"
-          )}
+        <button
+          type="submit"
+          onClick={() => handleUpdatedStock(item.id)}
+          className="btn btn--primary"
+          disabled={updateLoading}
+        >
+          {updateLoading ? <ButtonSpinner /> : "Update"}
         </button>
-      </form>
-    </div>
+      </div>
+
+      {/* Small preview */}
+      {updatedStock && (
+        <small className="mt-2 text-muted">
+          {item.stock} + {updatedStock} ={" "}
+          <b>
+            {Number(item.stock) + Number(updatedStock)} {item.unit}
+          </b>
+        </small>
+      )}
+    </form>
   );
 };
 

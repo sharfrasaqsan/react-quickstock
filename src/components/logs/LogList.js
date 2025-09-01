@@ -1,11 +1,15 @@
 import LogCard from "./LogCard";
 import { useData } from "../../contexts/DataContext";
+import NotFoundText from "../../utils/NotFoundText";
 
 const LogList = () => {
   const { filteredLogs, users } = useData();
   const reversedLogs = [...filteredLogs].sort(
-    (a, b) => b.timestamp - a.timestamp
+    (a, b) => b.createdAt - a.createdAt
   );
+
+  if (!reversedLogs || reversedLogs.length === 0)
+    return <NotFoundText text={"No logs yet."} />;
 
   return (
     <div className="table-wrap">

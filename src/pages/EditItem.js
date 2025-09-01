@@ -6,7 +6,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { db } from "../firebase/Config";
 import { useData } from "../contexts/DataContext";
@@ -14,6 +14,7 @@ import ButtonSpinner from "../utils/ButtonSpinner";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
 import { useAuth } from "../contexts/AuthContext";
+import NotFoundText from "../utils/NotFoundText";
 
 const EditItem = () => {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ const EditItem = () => {
   const [unit, setUnit] = useState("");
 
   const [buttonLoading, setButtonLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -96,6 +98,7 @@ const EditItem = () => {
       setName("");
       setStock(0);
       setUnit("");
+      navigate("/");
 
       // New Log
       const newLog = {
@@ -127,8 +130,8 @@ const EditItem = () => {
 
   if (loading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/" replace />;
-  if (!items) return <p>No items found</p>;
-  if (!item) return <p>Item not found</p>;
+  if (!items) return <NotFoundText text="No items found" />;
+  if (!item) return <NotFoundText text="Item not found" />;
 
   return (
     <section className="container stack">
