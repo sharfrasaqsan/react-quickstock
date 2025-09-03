@@ -17,8 +17,8 @@ export const DataProvider = ({ children }) => {
 
     const fetchItems = onSnapshot(
       collection(db, "items"),
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
+      (res) => {
+        const data = res.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -55,22 +55,26 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      setLoading(true);
-      try {
-        const res = await getDocs(collection(db, "logs"));
-        const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setLoading(true);
+
+    const fetchLogs = onSnapshot(
+      collection(db, "logs"),
+      (res) => {
+        const data = res.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setLogs(data);
-      } catch (err) {
+        setLoading(false);
+      },
+      (err) => {
         console.log("Error fetching logs", err.code, err.message);
         toast.error("Error fetching logs");
         setLoading(false);
-      } finally {
-        setLoading(false);
       }
-    };
+    );
 
-    fetchLogs();
+    return () => fetchLogs();
   }, []);
 
   // Item Search
