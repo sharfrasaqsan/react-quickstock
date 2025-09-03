@@ -29,6 +29,12 @@ const ItemsCard = ({ item, index, user }) => {
   const deleteItem = async (itemId) => {
     setDeleteLoading(true);
     try {
+      if (user?.role === "worker") {
+        toast.error("You are not allowed to delete items");
+        setDeleteLoading(false);
+        return;
+      }
+
       await deleteDoc(doc(db, "items", itemId));
       setItems((prev) => prev.filter((item) => item.id !== itemId));
       toast.success("Item deleted successfully");
@@ -46,13 +52,7 @@ const ItemsCard = ({ item, index, user }) => {
       const deleteLog = await addDoc(collection(db, "logs"), newLog);
       setLogs((prev) => [...prev, { id: deleteLog.id, ...newLog }]);
     } catch (err) {
-      console.log(
-        "Error deleting item",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
+      console.log("Error deleting item", err.code, err.message);
       toast.error("Error deleting item");
     }
     setDeleteLoading(false);
@@ -107,19 +107,22 @@ const ItemsCard = ({ item, index, user }) => {
         <Link to={`/edit-item/${item.id}`} className="btn btn--info">
           Edit
         </Link>
-        <button
-          className="btn btn--danger"
-          onClick={() => deleteItem(item.id)}
-          disabled={deleteLoading}
-        >
-          {deleteLoading ? (
-            <>
-              Deleting… <ButtonSpinner />
-            </>
-          ) : (
-            "Delete"
-          )}
-        </button>
+
+        {user && user?.role === "admin" && (
+          <button
+            className="btn btn--danger"
+            onClick={() => deleteItem(item.id)}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? (
+              <>
+                Deleting… <ButtonSpinner />
+              </>
+            ) : (
+              "Delete"
+            )}
+          </button>
+        )}
       </div>
     </article>
   );

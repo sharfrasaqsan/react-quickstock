@@ -32,13 +32,7 @@ const Logout = () => {
         navigate("/login");
       }, 2000);
     } catch (err) {
-      console.log(
-        "Error logging out",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
+      console.log("Error logging out", err.code, err.message);
       toast.error("Error logging out");
     }
 

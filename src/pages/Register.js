@@ -16,6 +16,7 @@ import { useData } from "../contexts/DataContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
+import getFirebaseErrorMessage from "../utils/ErrorMessages";
 
 const Register = () => {
   const { setUser } = useAuth();
@@ -64,17 +65,11 @@ const Register = () => {
       return;
     }
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      setRegisterLoading(false);
-      return;
-    }
-
     const existEmail = await getDocs(
       query(collection(db, "users"), where("email", "==", email))
     );
-    if (existEmail.length > 0) {
-      toast.error("Email already exists.");
+    if (!existEmail.empty) {
+      toast.error("Email already exists in database.");
       setRegisterLoading(false);
       return;
     }
@@ -90,7 +85,7 @@ const Register = () => {
         id: uid,
         name,
         email,
-        role: "analyst",
+        role: "worker",
         createdAt: serverTimestamp(),
       };
       await setDoc(doc(db, "users", uid), newUser);
@@ -103,14 +98,8 @@ const Register = () => {
       setConfirmPassword("");
       navigate("/");
     } catch (err) {
-      console.log(
-        "Error registering user",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
-      toast.error("Error registering user");
+      console.log("Error registering user", err.code, err.message);
+      toast.error(getFirebaseErrorMessage(err.code));
     }
     setRegisterLoading(false);
   };

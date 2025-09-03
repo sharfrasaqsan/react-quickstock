@@ -107,13 +107,7 @@ const AddItem = () => {
       const addLog = await addDoc(collection(db, "logs"), newLog);
       setLogs((prev) => [...prev, { id: addLog.id, ...newLog }]);
     } catch (err) {
-      console.log(
-        "Error adding item",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
+      console.log("Error adding item", err.code, err.message);
       toast.error("Error adding item");
     }
     setButtonLoading(false);

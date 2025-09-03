@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/Config";
 import { toast } from "sonner";
 
@@ -13,28 +13,26 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const res = await getDocs(collection(db, "items"));
-        const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setLoading(true);
+
+    const fetchItems = onSnapshot(
+      collection(db, "items"),
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setItems(data);
-      } catch (err) {
-        console.log(
-          "Error fetching items",
-          "error: ",
-          err,
-          "error message: ",
-          err.message
-        );
+        setLoading(false);
+      },
+      (err) => {
+        console.log("Error fetching items", err.code, err.message);
         toast.error("Error fetching items");
         setLoading(false);
-      } finally {
-        setLoading(false);
       }
-    };
+    );
 
-    fetchItems();
+    return () => fetchItems();
   }, []);
 
   useEffect(() => {
@@ -45,13 +43,7 @@ export const DataProvider = ({ children }) => {
         const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setUsers(data);
       } catch (err) {
-        console.log(
-          "Error fetching users",
-          "error: ",
-          err,
-          "error message: ",
-          err.message
-        );
+        console.log("Error fetching users", err.code, err.message);
         toast.error("Error fetching users");
         setLoading(false);
       } finally {
@@ -70,13 +62,7 @@ export const DataProvider = ({ children }) => {
         const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setLogs(data);
       } catch (err) {
-        console.log(
-          "Error fetching logs",
-          "error: ",
-          err,
-          "error message: ",
-          err.message
-        );
+        console.log("Error fetching logs", err.code, err.message);
         toast.error("Error fetching logs");
         setLoading(false);
       } finally {

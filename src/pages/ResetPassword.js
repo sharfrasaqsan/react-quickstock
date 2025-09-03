@@ -5,6 +5,7 @@ import { auth, db } from "../firebase/Config";
 import { sendPasswordResetEmail } from "firebase/auth";
 import ButtonSpinner from "../utils/ButtonSpinner";
 import PageHeader from "../components/PageHeader";
+import getFirebaseErrorMessage from "../utils/ErrorMessages";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
@@ -34,14 +35,8 @@ const ResetPassword = () => {
       toast.success("Password reset email sent.");
       setEmail("");
     } catch (err) {
-      console.log(
-        "Error resetting password",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
-      toast.error("Error resetting password");
+      console.log("Error resetting password", err.code, err.message);
+      toast.error(getFirebaseErrorMessage(err.code));
     }
 
     setResetLoading(false);
