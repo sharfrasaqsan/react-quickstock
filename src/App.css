@@ -55,7 +55,7 @@ button {
 
 :root {
   /* Brand */
-  --brand: #10b981; /* Emerald (primary) */
+  --brand: #10b981;
   --brand-700: #059669;
   --brand-800: #047857;
   --danger-700: #b91c1c;
@@ -71,12 +71,12 @@ button {
   --danger: #ef4444;
 
   /* Surfaces & Text (Light) */
-  --bg: #f9fafb; /* page background */
-  --surface-1: #ffffff; /* cards, elevated areas */
-  --surface-2: #f3f4f6; /* subtle sections */
-  --fg: #0f172a; /* primary text (slate-900) */
-  --fg-muted: #6b7280; /* secondary text */
-  --border: #e5e7eb; /* borders, dividers */
+  --bg: #f9fafb;
+  --surface-1: #ffffff;
+  --surface-2: #f3f4f6;
+  --fg: #0f172a;
+  --fg-muted: #6b7280;
+  --border: #e5e7eb;
   --ring: rgba(16, 185, 129, 0.45);
 
   /* Misc */
