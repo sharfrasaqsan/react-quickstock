@@ -16,6 +16,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import getFirebaseErrorMessage from "../utils/ErrorMessages";
 
 const Login = () => {
   const { user, setUser } = useAuth();
@@ -45,17 +46,17 @@ const Login = () => {
       return;
     }
 
-    const regEmail = await getDocs(
-      query(collection(db, "users"), where("email", "==", email))
-    );
-    if (regEmail.docs.length === 0) {
-      toast.error("User does not exist.");
+    if (!password) {
+      toast.error("Password cannot be empty.");
       setLoginLoading(false);
       return;
     }
 
-    if (!password) {
-      toast.error("Password cannot be empty.");
+    const regEmail = await getDocs(
+      query(collection(db, "users"), where("email", "==", email))
+    );
+    if (regEmail.empty) {
+      toast.error("User does not exist.");
       setLoginLoading(false);
       return;
     }
@@ -87,14 +88,8 @@ const Login = () => {
 
       navigate("/");
     } catch (err) {
-      console.log(
-        "Error logging in",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
-      toast.error("Error logging in");
+      console.log("Error logging in", err.code, err.message);
+      toast.error(getFirebaseErrorMessage(err.code));
     } finally {
       setLoginLoading(false);
     }

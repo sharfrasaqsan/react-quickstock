@@ -52,13 +52,7 @@ const UpdateStock = ({ item }) => {
       const updateLog = await addDoc(collection(db, "logs"), newLog);
       setLogs((prev) => [...prev, { id: updateLog.id, ...newLog }]);
     } catch (err) {
-      console.log(
-        "Error updating stock",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
+      console.log("Error updating stock", err.code, err.message);
       toast.error("Error updating stock");
     } finally {
       if (updatedStockValue > item.lowStock) {

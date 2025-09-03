@@ -162,13 +162,7 @@ const EditItem = () => {
       }, [1000]);
       toast.warning("Item update cancelled");
     } catch (err) {
-      console.log(
-        "Error updating item",
-        "error: ",
-        err,
-        "error message: ",
-        err.message
-      );
+      console.log("Error updating item", err.code, err.message);
       toast.error("Error updating item");
     }
     setButtonLoading(false);
