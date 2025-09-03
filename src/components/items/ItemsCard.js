@@ -18,9 +18,13 @@ const ItemsCard = ({ item, index, user }) => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const isLow = useMemo(() => {
-    if (typeof item.lowStockThreshold !== "number") return false;
-    return item.stock <= item.lowStockThreshold;
-  }, [item.stock, item.lowStockThreshold]);
+    if (typeof item.lowStock !== "number") return false;
+    return item.stock <= item.lowStock && item.stock > 0;
+  }, [item.stock, item.lowStock]);
+
+  const isOutOfStock = useMemo(() => {
+    return item.stock === 0;
+  }, [item.stock]);
 
   const deleteItem = async (itemId) => {
     setDeleteLoading(true);
@@ -58,7 +62,11 @@ const ItemsCard = ({ item, index, user }) => {
   if (!user) return <p>User not found</p>;
 
   return (
-    <article className={`item-card card ${isLow ? "item-card--low" : ""}`}>
+    <article
+      className={`item-card card ${isLow ? "item-card--low" : ""} ${
+        isOutOfStock ? "item-card--out" : ""
+      }`}
+    >
       <div className="item-card__main">
         <div className="item-card__title">
           <span className="item-card__index" aria-hidden>
@@ -66,7 +74,10 @@ const ItemsCard = ({ item, index, user }) => {
           </span>
           <div className="item-card__name">
             <strong>{item.name}</strong>
-            {isLow && <span className="badge badge--low">Low</span>}
+            {isLow && <span className="badge badge--low">Low Stock</span>}
+            {isOutOfStock && (
+              <span className="badge badge--out">Out of Stock</span>
+            )}
           </div>
         </div>
 
@@ -87,8 +98,6 @@ const ItemsCard = ({ item, index, user }) => {
             className="item-card__stepper stepper"
             aria-label={`Adjust ${item.name} stock`}
           >
-            {/* <RemoveStocks item={item} />
-            <AddStocks item={item} /> */}
             <UpdateStock item={item} />
           </div>
         </div>

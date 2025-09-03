@@ -21,7 +21,8 @@ const EditItem = () => {
   const { items, setItems, setLogs, loading } = useData();
 
   const [name, setName] = useState("");
-  const [stock, setStock] = useState(0);
+  const [stock, setStock] = useState("");
+  const [lowStock, setLowStock] = useState("");
   const [unit, setUnit] = useState("");
 
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -35,6 +36,7 @@ const EditItem = () => {
     if (item) {
       setName(item.name);
       setStock(item.stock);
+      setLowStock(item.lowStock);
       setUnit(item.unit);
     }
   }, [item]);
@@ -59,6 +61,12 @@ const EditItem = () => {
       return;
     }
 
+    if (lowStock === null) {
+      toast.error("Low stock cannot be empty.");
+      setButtonLoading(false);
+      return;
+    }
+
     if (unit.trim() === "") {
       toast.error("Unit cannot be empty.");
       setButtonLoading(false);
@@ -67,6 +75,18 @@ const EditItem = () => {
 
     if (stock < 0) {
       toast.error("Stock cannot be negative.");
+      setButtonLoading(false);
+      return;
+    }
+
+    if (lowStock < 0) {
+      toast.error("Low stock cannot be negative.");
+      setButtonLoading(false);
+      return;
+    }
+
+    if (lowStock > stock) {
+      toast.error("Low stock cannot be greater than stock.");
       setButtonLoading(false);
       return;
     }
@@ -87,6 +107,7 @@ const EditItem = () => {
       const updatedItem = {
         name,
         stock,
+        lowStock,
         unit,
         updatedAt: serverTimestamp(),
       };
@@ -128,6 +149,31 @@ const EditItem = () => {
     setButtonLoading(false);
   };
 
+  const cencelUpdateItem = () => {
+    setButtonLoading(false);
+    try {
+      setName(item.name);
+      setStock(item.stock);
+      setLowStock(item.lowStock);
+      setUnit(item.unit);
+
+      setTimeout(() => {
+        navigate("/");
+      }, [1000]);
+      toast.warning("Item update cancelled");
+    } catch (err) {
+      console.log(
+        "Error updating item",
+        "error: ",
+        err,
+        "error message: ",
+        err.message
+      );
+      toast.error("Error updating item");
+    }
+    setButtonLoading(false);
+  };
+
   if (loading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/" replace />;
   if (!items) return <NotFoundText text="No items found" />;
@@ -156,8 +202,11 @@ const EditItem = () => {
             Item Name
           </label>
           <input
-            className="input"
+            type="text"
             id="name"
+            name="name"
+            placeholder="Item Name"
+            className="input"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -168,11 +217,28 @@ const EditItem = () => {
             Stock
           </label>
           <input
-            className="input"
             type="number"
             id="stock"
+            name="stock"
+            placeholder="Stock"
+            className="input"
             value={stock}
             onChange={(e) => setStock(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="lowStock">
+            Low Stock
+          </label>
+          <input
+            type="number"
+            id="lowStock"
+            name="lowStock"
+            placeholder="Low Stock"
+            className="input"
+            value={lowStock}
+            onChange={(e) => setLowStock(Number(e.target.value))}
           />
         </div>
 
@@ -181,8 +247,11 @@ const EditItem = () => {
             Unit
           </label>
           <select
-            className="select"
+            type="text"
             id="unit"
+            name="unit"
+            placeholder="Unit"
+            className="select"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
           >
@@ -195,7 +264,7 @@ const EditItem = () => {
           </select>
         </div>
 
-        <div>
+        <div className="d-flex align-content-center justify-content-start gap-3">
           <button
             type="submit"
             className="btn btn--primary"
@@ -207,6 +276,21 @@ const EditItem = () => {
               </>
             ) : (
               "Update Item"
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="btn btn--danger"
+            onClick={() => cencelUpdateItem()}
+            disabled={buttonLoading}
+          >
+            {buttonLoading ? (
+              <>
+                Canceling… <ButtonSpinner />
+              </>
+            ) : (
+              "Cancel"
             )}
           </button>
         </div>

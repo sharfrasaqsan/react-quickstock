@@ -32,18 +32,33 @@ const Navbar = () => {
             </NavLink>
           </li>
 
-          {(user.role === "admin" || user.role === "manager") && (
+          <div className="d-flex align-items-center gap-3">
+            {(user?.role === "admin" || user?.role === "manager") && (
+              <li>
+                <NavLink
+                  to="logs"
+                  className={({ isActive }) =>
+                    `btn ${
+                      isActive ? "btn--primary" : "btn--outline"
+                    } nav__link`
+                  }
+                >
+                  Logs
+                </NavLink>
+              </li>
+            )}
+
             <li>
               <NavLink
-                to="logs"
+                to={`/profile/${user.id}`}
                 className={({ isActive }) =>
                   `btn ${isActive ? "btn--primary" : "btn--outline"} nav__link`
                 }
               >
-                Logs
+                Profile
               </NavLink>
             </li>
-          )}
+          </div>
         </ul>
       </nav>
     </aside>

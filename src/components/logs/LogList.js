@@ -4,7 +4,7 @@ import NotFoundText from "../../utils/NotFoundText";
 
 const LogList = () => {
   const { filteredLogs, logSearch, users } = useData();
-  const reversedLogs = [...filteredLogs].sort(
+  const reversedLogs = [...filteredLogs]?.sort(
     (a, b) => b.createdAt - a.createdAt
   );
 
