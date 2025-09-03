@@ -14,7 +14,8 @@ const AddItem = () => {
   const { setItems, setLogs, loading } = useData();
 
   const [name, setName] = useState("");
-  const [stock, setStock] = useState(0);
+  const [stock, setStock] = useState("");
+  const [lowStock, setLowStock] = useState("");
   const [unit, setUnit] = useState("");
 
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -35,6 +36,12 @@ const AddItem = () => {
       return;
     }
 
+    if (lowStock === null) {
+      toast.error("Low stock cannot be empty.");
+      setButtonLoading(false);
+      return;
+    }
+
     if (unit.trim() === "") {
       toast.error("Unit cannot be empty.");
       setButtonLoading(false);
@@ -43,6 +50,18 @@ const AddItem = () => {
 
     if (stock < 0) {
       toast.error("Stock cannot be negative.");
+      setButtonLoading(false);
+      return;
+    }
+
+    if (lowStock < 0) {
+      toast.error("Low stock cannot be negative.");
+      setButtonLoading(false);
+      return;
+    }
+
+    if (lowStock > stock) {
+      toast.error("Low stock cannot be greater than stock.");
       setButtonLoading(false);
       return;
     }
@@ -63,6 +82,7 @@ const AddItem = () => {
       const newItem = {
         name,
         stock,
+        lowStock,
         unit,
         createdAt: serverTimestamp(),
       };
@@ -70,7 +90,7 @@ const AddItem = () => {
       setItems((prev) => [...prev, { id: res.id, ...newItem }]);
       toast.success("Item added successfully");
       setName("");
-      setStock(0);
+      setStock("");
       setUnit("");
       navigate("/");
 
@@ -132,6 +152,7 @@ const AddItem = () => {
             type="text"
             id="name"
             value={name}
+            placeholder="Enter item name"
             onChange={(e) => setName(e.target.value)}
             autoFocus
             autoComplete="off"
@@ -146,8 +167,23 @@ const AddItem = () => {
             className="input"
             type="number"
             id="stock"
+            placeholder="Enter stock"
             value={stock}
             onChange={(e) => setStock(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="lowStock">
+            Low Stock
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="lowStock"
+            placeholder="Enter low stock"
+            value={lowStock}
+            onChange={(e) => setLowStock(Number(e.target.value))}
           />
         </div>
 
@@ -158,6 +194,7 @@ const AddItem = () => {
           <select
             className="select"
             id="unit"
+            name="unit"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
           >
@@ -167,6 +204,7 @@ const AddItem = () => {
             <option value="kg">kg</option>
             <option value="L">L</option>
             <option value="pcs">pcs</option>
+            <option value="cans">cans</option>
           </select>
         </div>
 

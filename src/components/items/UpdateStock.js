@@ -27,15 +27,15 @@ const UpdateStock = ({ item }) => {
     }
 
     setUpdateLoading(true);
+    let updatedStockValue;
     try {
-      const updatedStockValue = Number(item.stock) + Number(updatedStock);
+      updatedStockValue = Number(item.stock) + Number(updatedStock);
       await updateDoc(doc(db, "items", itemId), { stock: updatedStockValue });
       setItems((prev) =>
         prev?.map((item) =>
           item.id === itemId ? { ...item, stock: updatedStockValue } : item
         )
       );
-      toast.success("Stock updated successfully");
       setUpdatedStock("");
 
       // New log
@@ -60,6 +60,22 @@ const UpdateStock = ({ item }) => {
         err.message
       );
       toast.error("Error updating stock");
+    } finally {
+      if (updatedStockValue > item.lowStock) {
+        toast.success(
+          `Stock updated successfully for ${item.name}. ${updatedStockValue} ${item.unit} left.`
+        );
+      }
+
+      if (updatedStockValue <= item.lowStock && updatedStockValue > 0) {
+        toast.warning(
+          `Warning: Stock is low for ${item.name}. Only ${updatedStockValue} left.`
+        );
+      }
+
+      if (updatedStockValue === 0) {
+        toast.warning(`Warning: Stock is out of stock for ${item.name}.`);
+      }
     }
     setUpdateLoading(false);
   };
@@ -89,7 +105,13 @@ const UpdateStock = ({ item }) => {
           className="btn btn--primary"
           disabled={updateLoading}
         >
-          {updateLoading ? <ButtonSpinner /> : "Update"}
+          {updateLoading ? (
+            <>
+              Updating... <ButtonSpinner />
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
 

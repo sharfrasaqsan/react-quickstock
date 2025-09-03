@@ -16,6 +16,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PublicRoute from "./utils/PublicRoute";
 import Logs from "./pages/Logs";
 import AdminProtectedRoute from "./utils/AdminProtectedRoute";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   return (
@@ -83,6 +84,15 @@ function App() {
               <AdminProtectedRoute>
                 <Logs />
               </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
             }
           />
 

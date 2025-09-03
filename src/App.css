@@ -380,7 +380,10 @@ small {
   color: var(--fg);
 }
 .badge--low {
-  background: color-mix(in oklab, var(--accent) 24%, var(--surface-1));
+  background: var(--accent);
+}
+.badge--out {
+  background: var(--danger);
 }
 
 /* =============== Table =============== */
@@ -602,7 +605,12 @@ small {
 }
 
 .item-card--low {
-  outline: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.item-card--out {
+  outline: 2px solid var(--danger);
   outline-offset: 0;
 }
 
@@ -709,4 +717,30 @@ small {
   display: flex;
   gap: var(--sp-2);
   flex-wrap: wrap;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-3);
+  flex-wrap: wrap;
+}
+.tab {
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+}
+.tab:hover {
+  filter: brightness(0.98);
+}
+.tab.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: transparent;
+}
+.tab:focus-visible {
+  box-shadow: 0 0 0 3px var(--ring);
 }

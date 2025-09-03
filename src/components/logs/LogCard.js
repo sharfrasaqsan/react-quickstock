@@ -1,11 +1,14 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const LogCard = ({ log, user, index }) => {
   return (
     <tr>
       <td>{index + 1}</td>
       <td className="mw-50" style={{ minWidth: "250px" }}>
-        {user ? user.name : log.userId}
+        <Link to={`/profile/${log.userId}`}>
+          {user ? user.name : log.userId}
+        </Link>
       </td>
       <td className="text-muted" style={{ minWidth: "250px" }}>
         {user ? user.email : log.email}
