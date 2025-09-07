@@ -5,7 +5,7 @@ import LoadingSpinner from "../../utils/LoadingSpinner";
 import { useAuth } from "../../contexts/AuthContext";
 import NotFoundText from "../../utils/NotFoundText";
 
-const ItmesList = ({ activeTab = "inStock" }) => {
+const ItemsList = ({ activeTab = "inStock" }) => {
   const { user } = useAuth();
   const { items, filteredItems, itemSearch, loading } = useData();
 
@@ -49,4 +49,4 @@ const ItmesList = ({ activeTab = "inStock" }) => {
   );
 };
 
-export default ItmesList;
+export default ItemsList;

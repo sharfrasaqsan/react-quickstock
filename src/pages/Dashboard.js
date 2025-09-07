@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import ItmesList from "../components/items/ItmesList";
+import ItemsList from "../components/items/ItemsList";
 import PageHeader from "../components/PageHeader";
 import { Link } from "react-router-dom";
 import ItemSearch from "../components/items/ItemSearch";
@@ -58,7 +58,7 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <ItmesList activeTab={activeTab} />
+          <ItemsList activeTab={activeTab} />
         </div>
       </div>
     </section>
