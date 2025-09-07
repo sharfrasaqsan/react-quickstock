@@ -103,6 +103,12 @@ const EditItem = () => {
       return;
     }
 
+    if (user.role === "worker") {
+      toast.error("You are not allowed to update items");
+      setButtonLoading(false);
+      return;
+    }
+
     try {
       const updatedItem = {
         name,

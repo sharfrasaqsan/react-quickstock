@@ -104,24 +104,26 @@ const ItemsCard = ({ item, index, user }) => {
       </div>
 
       <div className="item-card__actions">
-        <Link to={`/edit-item/${item.id}`} className="btn btn--info">
-          Edit
-        </Link>
-
         {user && user?.role === "admin" && (
-          <button
-            className="btn btn--danger"
-            onClick={() => deleteItem(item.id)}
-            disabled={deleteLoading}
-          >
-            {deleteLoading ? (
-              <>
-                Deleting… <ButtonSpinner />
-              </>
-            ) : (
-              "Delete"
-            )}
-          </button>
+          <>
+            <Link to={`/edit-item/${item.id}`} className="btn btn--info">
+              Edit
+            </Link>
+
+            <button
+              className="btn btn--danger"
+              onClick={() => deleteItem(item.id)}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <>
+                  Deleting… <ButtonSpinner />
+                </>
+              ) : (
+                "Delete"
+              )}
+            </button>
+          </>
         )}
       </div>
     </article>
