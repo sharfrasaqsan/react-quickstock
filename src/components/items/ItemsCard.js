@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   serverTimestamp,
   updateDoc,
@@ -13,229 +14,253 @@ import { useData } from "../../contexts/DataContext";
 import { useAuth } from "../../contexts/AuthContext";
 import ButtonSpinner from "../../utils/ButtonSpinner";
 
-/*
-  ItemCard — compact card for grid/mobile views.
-  - Shows name, id, stock, threshold, status badge
-  - Inline edit (number input only), Save/Cancel
-  - Save updates Firestore + DataContext and logs UPDATE_STOCK
-  - No redirects
-*/
-
-function ItemCard({ item }) {
+export default function ItemsCard({ item }) {
   const { user } = useAuth();
   const { setItems, setLogs } = useData();
 
-  // local UI state
   const [editing, setEditing] = useState(false);
-  const [stockInput, setStockInput] = useState(String(Number(item.stock) || 0));
-  const [isInvalid, setIsInvalid] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
+  const [stockInput, setStockInput] = useState(
+    String(Number(item?.stock) || 0)
+  );
+  const [isInvalid, setIsInvalid] = useState(false);
 
-  // tiny helpers (kept close for readability)
-  const num = (n) => (Number(n) || 0).toLocaleString();
-  const thresholdOf = (it) =>
-    typeof it.lowStock === "number"
-      ? it.lowStock
-      : typeof it.minStock === "number"
-      ? it.minStock
-      : 0;
-  const statusOf = (it) => {
-    const stock = Number(it.stock) || 0;
-    const thr = thresholdOf(it);
-    if (stock === 0) return "out";
-    if (thr > 0 && stock <= thr) return "low";
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const status = useMemo(() => {
+    const s = Number(item?.stock ?? 0);
+    const thr = Number(item?.lowStock ?? 0);
+    if (s <= 0) return "out";
+    if (s <= thr) return "low";
     return "in";
-  };
-  const badge = (s) =>
-    s === "out"
-      ? "badge text-bg-danger"
-      : s === "low"
-      ? "badge text-bg-warning"
-      : "badge text-bg-success";
+  }, [item]);
 
-  const s = statusOf(item);
-  const thr = thresholdOf(item);
+  const badge = useMemo(() => {
+    switch (status) {
+      case "out":
+        return { className: "badge text-bg-danger", text: "Out of stock" };
+      case "low":
+        return { className: "badge text-bg-warning", text: "Low stock" };
+      default:
+        return { className: "badge text-bg-success", text: "In stock" };
+    }
+  }, [status]);
+
+  // Subtle row background per status (keeps stripes & hover)
+  const rowClass =
+    status === "out"
+      ? "table-danger"
+      : status === "low"
+      ? "table-warning"
+      : "table-success-subtle";
 
   function onStockChange(e) {
     const v = e.target.value;
     setStockInput(v);
     const n = Number(v);
-    setIsInvalid(!(Number.isFinite(n) && n >= 0));
+    setIsInvalid(!(Number.isFinite(n) && n >= 0 && Number.isInteger(n)));
+  }
+
+  function startEdit() {
+    setStockInput(String(Number(item.stock) || 0));
+    setIsInvalid(false);
+    setEditing(true);
   }
 
   function cancel() {
     setEditing(false);
     setStockInput(String(Number(item.stock) || 0));
-    setMsg("");
+    setIsInvalid(false);
   }
 
   async function save() {
-    const newStock = Math.max(0, Number(stockInput) || 0);
+    if (isInvalid || stockInput === "") {
+      toast.error("Please enter a valid non-negative whole number.");
+      return;
+    }
+    if (user?.role === "worker") {
+      toast.error("You are not allowed to update items");
+      return;
+    }
+
+    const nextStock = Number(stockInput);
     setSaving(true);
-    setMsg("");
-
     try {
-      // 1) Update Firestore
-      await updateDoc(doc(db, "items", item.id), { stock: newStock });
+      await updateDoc(doc(db, "items", item.id), {
+        stock: nextStock,
+        updatedAt: serverTimestamp(),
+      });
 
-      // 2) Update client state
       setItems((prev) =>
-        prev.map((it) => (it.id === item.id ? { ...it, stock: newStock } : it))
+        prev?.map((i) => (i.id === item.id ? { ...i, stock: nextStock } : i))
       );
 
-      // 3) Log action (UPDATE_STOCK)
       const newLog = {
         userId: user?.id,
         action: "UPDATE_STOCK",
         itemName: item.name,
+        stockFrom: item.stock,
+        stockTo: nextStock,
         itemUnit: item.unit,
-        stockFrom: Number(item.stock),
-        stockTo: newStock,
         createdAt: serverTimestamp(),
         createdAtMs: Date.now(),
       };
-      const logDoc = await addDoc(collection(db, "logs"), newLog);
-      setLogs((prev) => [...prev, { id: logDoc.id, ...newLog }]);
-
-      // 4) UX feedback
-      const now = newStock;
-      if (thr > 0 && now <= thr && now > 0) {
-        toast.warning(`Low stock: ${item.name} • ${now} ${item.unit || ""}`);
-      } else if (now === 0) {
-        toast.warning(`Out of stock: ${item.name}`);
-      } else {
-        toast.success(`Stock updated for ${item.name}`);
-      }
-      setMsg("Stock updated.");
+      const logRef = await addDoc(collection(db, "logs"), newLog);
+      setLogs?.((prev) => [...(prev || []), { id: logRef.id, ...newLog }]);
+      toast.success("Stock updated");
       setEditing(false);
-    } catch (e) {
-      console.error("Error updating stock", e);
-      toast.error("Could not update stock.");
-      setMsg("Could not update stock. Please try again.");
+    } catch (err) {
+      console.error("Error updating stock", err);
+      toast.error("Error updating stock");
     } finally {
       setSaving(false);
     }
   }
 
-  function onKeyDown(e) {
-    if (e.key === "Enter" && !isInvalid && !saving) save();
-    if (e.key === "Escape" && !saving) cancel();
-  }
+  const deleteItem = async (itemId) => {
+    setDeleteLoading(true);
+    try {
+      if (user?.role === "worker") {
+        toast.error("You are not allowed to delete items");
+        setDeleteLoading(false);
+        return;
+      }
+
+      await deleteDoc(doc(db, "items", itemId));
+      setItems((prev) => prev.filter((item) => item.id !== itemId));
+      toast.success("Item deleted successfully");
+
+      // new Log
+      const newLog = {
+        userId: user.id,
+        action: "DELETE_ITEM",
+        itemName: item.name,
+        stock: item.stock,
+        itemUnit: item.unit,
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+      };
+      const deleteLog = await addDoc(collection(db, "logs"), newLog);
+      setLogs((prev) => [...prev, { id: deleteLog.id, ...newLog }]);
+    } catch (err) {
+      console.log("Error deleting item", err.code, err.message);
+      toast.error("Error deleting item");
+    }
+    setDeleteLoading(false);
+  };
+
+  if (!item) return null;
 
   return (
-    <div className="card h-100">
-      <div className="card-body">
-        {/* Header: name/id + badge */}
-        <div className="d-flex justify-content-between align-items-start">
-          <div>
-            <div className="fw-semibold">{item.name || "Unnamed item"}</div>
-            <div className="text-muted small">{String(item.id)}</div>
-          </div>
-          <span className={badge(s)}>
-            {s === "in" ? "In" : s === "low" ? "Low" : "Out"}
-          </span>
+    <tr className={rowClass}>
+      {/* Name */}
+      <td className="text-truncate" title={item.name}>
+        <div className="fw-semibold">{item.name}</div>
+        <div className="text-muted small">
+          ID: <span className="font-monospace">{item.id}</span>
         </div>
+      </td>
 
-        {/* Stock / Threshold */}
-        <div className="mt-3">
-          {!editing ? (
-            <div className="d-flex justify-content-between">
-              <div>
-                <div className="text-muted small">Current Stock</div>
-                <div className="fs-5 fw-semibold">{num(item.stock)}</div>
-              </div>
-              <div className="text-end">
-                <div className="text-muted small">Min/Threshold</div>
-                <div className="fw-medium">{thr ? num(thr) : "—"}</div>
-              </div>
-            </div>
-          ) : (
-            <>
-              <label htmlFor={`stock-${item.id}`} className="form-label">
-                New stock
-              </label>
+      {/* Low alert */}
+      <td className="fw-semibold">{item.lowStock}</td>
+
+      {/* Stock (inline edit) */}
+      <td>
+        {!editing ? (
+          <div className="d-inline-flex align-items-center gap-2">
+            <span className="fw-semibold">{item.stock}</span>
+            <span className="text-muted small text-nowrap"></span>
+          </div>
+        ) : (
+          <div className="d-inline-block" style={{ minWidth: 220 }}>
+            <div className="input-group input-group-sm">
+              <span className="input-group-text">Stock</span>
               <input
-                id={`stock-${item.id}`}
                 type="number"
-                min={0}
                 className={`form-control ${isInvalid ? "is-invalid" : ""}`}
+                placeholder="0"
                 value={stockInput}
                 onChange={onStockChange}
-                onKeyDown={onKeyDown}
-                disabled={saving}
+                inputMode="numeric"
+                min="0"
+                step="1"
+                required
+                aria-label="Stock"
               />
-              {isInvalid && (
-                <div className="invalid-feedback">
-                  Please enter 0 or a positive number.
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* feedback */}
-        {msg && (
-          <div
-            className="alert alert-info mt-3 mb-0 py-2"
-            role="status"
-            aria-live="polite"
-          >
-            {msg}
+              <span className="input-group-text">{item.unit}</span>
+              <div className="invalid-feedback text-start">
+                Enter a non-negative whole number.
+              </div>
+            </div>
           </div>
         )}
+      </td>
 
-        {/* Actions */}
-        <div className="d-flex flex-wrap gap-2 mt-3">
-          {!editing ? (
-            <>
-              <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => setEditing(true)}
-              >
-                Update stock
-              </button>
-              <Link
-                to={`/items/${item.id}`}
-                className="btn btn-outline-secondary btn-sm"
-              >
-                Details
-              </Link>
-              <Link
-                to={`/items/${item.id}/edit`}
-                className="btn btn-outline-secondary btn-sm"
-              >
-                Edit
-              </Link>
-            </>
-          ) : (
-            <>
-              <button
-                className="btn btn-success btn-sm d-inline-flex align-items-center"
-                onClick={save}
-                disabled={saving || isInvalid}
-              >
-                {saving && (
-                  <>
-                    <ButtonSpinner />
-                    <span className="ms-2" />
-                  </>
-                )}
-                {saving ? "Saving…" : "Save"}
-              </button>
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={cancel}
-                disabled={saving}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+      {/* Status */}
+      <td>
+        <span className={badge.className}>{badge.text}</span>
+      </td>
+
+      {/* Actions */}
+      <td className="text-end">
+        {!editing ? (
+          <div
+            className="btn-group btn-group-sm gap-3"
+            role="group"
+            aria-label="Row actions"
+          >
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={startEdit}
+            >
+              Stock
+            </button>
+            <Link to={`/items/edit/${item.id}`} className="btn btn-secondary">
+              Edit
+            </Link>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => deleteItem(item.id)}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <>
+                  Deleting… <ButtonSpinner />
+                </>
+              ) : (
+                "Delete"
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="d-inline-flex gap-2">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={save}
+              disabled={saving || isInvalid}
+            >
+              {saving ? (
+                <>
+                  Saving… <ButtonSpinner />
+                </>
+              ) : (
+                "Save"
+              )}
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={cancel}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </td>
+    </tr>
   );
 }
-
-export default ItemCard;

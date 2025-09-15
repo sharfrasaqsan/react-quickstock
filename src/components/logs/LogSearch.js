@@ -1,7 +1,7 @@
 import { useData } from "../../contexts/DataContext";
 
 const LogSearch = () => {
-  const { LogSearch, setLogSearch } = useData();
+  const { logSearch, setLogSearch } = useData();
 
   return (
     <div className="w-50 m-auto">
@@ -14,7 +14,7 @@ const LogSearch = () => {
         id="logsearch"
         placeholder="Search logs"
         className="input"
-        value={LogSearch}
+        value={logSearch}
         onChange={(e) => setLogSearch(e.target.value)}
       />
     </div>

@@ -23,12 +23,12 @@ const Navbar = () => {
 
           <li>
             <NavLink
-              to="/add-item"
+              to="/items"
               className={({ isActive }) =>
                 `btn ${isActive ? "btn--primary" : "btn--outline"} nav__link`
               }
             >
-              Add Item
+              Items
             </NavLink>
           </li>
 
