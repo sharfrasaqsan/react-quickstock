@@ -17,6 +17,7 @@ import PublicRoute from "./utils/PublicRoute";
 import Logs from "./pages/Logs";
 import AdminProtectedRoute from "./utils/AdminProtectedRoute";
 import UserProfile from "./pages/UserProfile";
+import Items from "./pages/Items";
 
 function App() {
   return (
@@ -36,6 +37,15 @@ function App() {
           />
 
           <Route
+            path="/items"
+            element={
+              <ProtectedRoute>
+                <Items />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/add-item"
             element={
               <ProtectedRoute>
@@ -45,7 +55,7 @@ function App() {
           />
 
           <Route
-            path="/edit-item/:id"
+            path="/items/edit/:id"
             element={
               <ProtectedRoute>
                 <EditItem />
@@ -61,6 +71,7 @@ function App() {
               </PublicRoute>
             }
           />
+
           <Route
             path="/register"
             element={
@@ -69,6 +80,7 @@ function App() {
               </PublicRoute>
             }
           />
+
           <Route
             path="reset-password"
             element={
@@ -77,7 +89,6 @@ function App() {
               </PublicRoute>
             }
           />
-
           <Route
             path="/logs"
             element={
@@ -86,7 +97,6 @@ function App() {
               </AdminProtectedRoute>
             }
           />
-
           <Route
             path="/profile/:id"
             element={
@@ -95,7 +105,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
