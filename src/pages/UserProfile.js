@@ -17,7 +17,7 @@ const UserProfile = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title="User Profile"
         subtitle="View and edit user details."

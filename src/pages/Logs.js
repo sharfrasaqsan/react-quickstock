@@ -6,13 +6,13 @@ import LogFilter from "../components/logs/LogFilter";
 
 const Logs = () => {
   return (
-    <section className="container">
+    <section className="container my-3">
       <PageHeader
         title="Activity Logs"
         subtitle="Track all changes made by users"
         actions={
           <>
-            <Link to="/" className="btn btn--outline">
+            <Link to="/" className="btn btn-primary">
               Back to Dashboard
             </Link>
           </>

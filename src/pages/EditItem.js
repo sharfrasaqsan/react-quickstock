@@ -180,12 +180,12 @@ const EditItem = () => {
   if (!item) return <NotFoundText text="Item not found" />;
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title={`Update: ${item.name}`}
         subtitle="Update the item details below."
         actions={
-          <Link to="/" className="btn btn--outline">
+          <Link to="/" className="btn btn-primary">
             Back to Dashboard
           </Link>
         }

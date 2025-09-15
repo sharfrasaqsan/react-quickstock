@@ -117,13 +117,13 @@ const AddItem = () => {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title="Add Item"
         subtitle="Create a new inventory item for QuickStock."
         actions={
           <>
-            <Link to="/" className="btn btn--outline">
+            <Link to="/" className="btn btn-primary">
               Back to Dashboard
             </Link>
           </>

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
 import LoadingSpinner from "../utils/LoadingSpinner";
-import ItemCard from "../components/items/ItemsCard";
 import ItemsList from "../components/items/ItemsList";
 
 function Items() {
@@ -10,8 +9,6 @@ function Items() {
 
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all"); // all | inStock | lowStock | outOfStock
-
-  if (loading) return <LoadingSpinner />;
 
   // tiny helpers (keep it obvious)
   const num = (n) => (Number(n) || 0).toLocaleString();
@@ -28,6 +25,7 @@ function Items() {
     if (thr > 0 && stock <= thr) return "low";
     return "in";
   };
+
   const matchesQuery = (it) => {
     if (!query) return true;
     const q = query.toLowerCase();
@@ -61,9 +59,23 @@ function Items() {
     if (tabMatches) visibleItems.push(it);
   }
 
+  useEffect(() => {
+    const applyHash = () => {
+      const h = window.location.hash.replace("#", "");
+      if (h === "low") setActiveTab("lowStock");
+      else if (h === "out") setActiveTab("outOfStock");
+      else if (h === "in") setActiveTab("inStock");
+      else setActiveTab("all");
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div className="container my-3">
-      {/* Page header */}
       <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2 pb-3 mb-3 border-bottom">
         <div>
           <h1 className="h3 mb-1">Items</h1>
@@ -75,13 +87,12 @@ function Items() {
           <Link to="/add-item" className="btn btn-primary">
             Add Item
           </Link>
-          <Link to="/dashboard" className="btn btn-outline-secondary">
+          <Link to="/" className="btn btn-outline-secondary">
             Back to Dashboard
           </Link>
         </div>
       </div>
 
-      {/* Search + tabs */}
       <div className="card mb-3">
         <div className="card-body">
           <div className="row g-2 align-items-center">
@@ -152,23 +163,6 @@ function Items() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Cards on mobile */}
-      <div className="row g-3 d-lg-none">
-        {visibleItems.length === 0 ? (
-          <div className="col-12">
-            <p className="text-muted mb-0">
-              No items match your search/filter.
-            </p>
-          </div>
-        ) : (
-          visibleItems.map((it) => (
-            <div key={it.id} className="col-12 col-sm-6">
-              <ItemCard item={it} />
-            </div>
-          ))
-        )}
       </div>
 
       {/* Table on desktop */}

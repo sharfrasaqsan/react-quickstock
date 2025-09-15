@@ -68,7 +68,6 @@ function Dashboard() {
 
   return (
     <div className="container my-3">
-      {/* Page header */}
       <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2 pb-3 mb-3 border-bottom">
         <div>
           <h1 className="h3 mb-1">Dashboard</h1>
@@ -77,14 +76,8 @@ function Dashboard() {
           </p>
         </div>
         <div className="d-flex gap-2">
-          <Link to="/items" className="btn btn-primary">
-            View Items
-          </Link>
           <Link to="/add-item" className="btn btn-outline-primary">
             Add Item
-          </Link>
-          <Link to="/logs" className="btn btn-outline-secondary">
-            View Logs
           </Link>
         </div>
       </div>
@@ -116,7 +109,7 @@ function Dashboard() {
               <div className="fs-4 fw-bold">{num(lowStockCount)}</div>
               <div className="mt-2">
                 <Link
-                  to="/items?filter=low"
+                  to="/items#low"
                   className="btn btn-sm btn-outline-secondary"
                 >
                   Review low stock
@@ -132,10 +125,7 @@ function Dashboard() {
               <div className="text-muted small">Stockouts</div>
               <div className="fs-4 fw-bold">{num(stockoutCount)}</div>
               <div className="mt-2">
-                <Link
-                  to="/items?filter=out"
-                  className="btn btn-sm btn-outline-danger"
-                >
+                <Link to="/items#out" className="btn btn-sm btn-outline-danger">
                   See out-of-stock
                 </Link>
               </div>
@@ -218,10 +208,11 @@ function Dashboard() {
             <p className="text-muted mb-0">No recent activity.</p>
           ) : (
             <ul className="list-group">
-              {recentLogs.map((log, i) => (
+              {recentLogs?.map((log, i) => (
                 <li key={log.id ?? i} className="list-group-item">
                   <div className="fw-medium">
-                    {log.message ?? log.title ?? "Updated inventory"}
+                    {log.action ?? "Updated inventory"}
+                    {log.itemName ? `: ${log.itemName}` : ""}
                   </div>
                   <div className="text-muted small">
                     {log.actor ? `${log.actor} · ` : ""}
