@@ -109,12 +109,12 @@ const Register = () => {
   }
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title="Create your account"
         subtitle="Join QuickStock to manage your inventory with ease."
         actions={
-          <Link to="/login" className="btn btn--outline">
+          <Link to="/login" className="btn btn-primary">
             Back to Login
           </Link>
         }
