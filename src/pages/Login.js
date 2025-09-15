@@ -100,12 +100,12 @@ const Login = () => {
   }
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title="Login"
         subtitle="Access your QuickStock dashboard."
         actions={
-          <Link to="/register" className="btn btn--outline">
+          <Link to="/register" className="btn btn-primary">
             Create account
           </Link>
         }

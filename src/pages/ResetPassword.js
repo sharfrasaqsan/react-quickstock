@@ -43,7 +43,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <section className="container stack">
+    <section className="container my-3 stack">
       <PageHeader
         title="Reset Password"
         subtitle="Get a password reset link via email."
